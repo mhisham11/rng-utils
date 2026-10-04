@@ -1,18 +1,21 @@
-import tkinter as tk
 import turtle as t
 import random
 import math 
 
+def get_number(prompt, num_type=int):
+    """Safely retrieves numeric input from the user to prevent ValueError crashes."""
+    while True:
+        try:
+            return num_type(input(prompt))
+        except ValueError:
+            print(f"Invalid input. Please enter a valid number.")
 
 def shapes():
-    print("*****Shape Generator*****")
-    print("")
+    print("*****Shape Generator*****\n")
 
     while True:
-        invalid = False
-        
         def draw_shape(length, sides):
-            #apothem: the distance from the center of a polygon to the midpoint of one of its sides
+            # apothem: the distance from the center of a polygon to the midpoint of one of its sides
             apothem = length / (2 * math.tan(math.pi / sides))
             t.clear()
             t.penup()
@@ -20,15 +23,19 @@ def shapes():
             t.setheading(0)
             t.pendown()
             angle = 360 / sides
-            for x in range(sides):
+            for _ in range(sides):
                 t.forward(length)
                 t.left(angle)
         
+        choice = input("Enter the regular shape you want to render: ").strip().lower()
+        
+        valid_polygons = {
+            "square": 4, "triangle": 3, "pentagon": 5, "hexagon": 6, 
+            "septagon": 7, "heptagon": 7, "octagon": 8, "nonagon": 9, "decagon": 10
+        }
 
-        choice = input("Enter the regular shape you want to render: ")
-
-        if choice.lower() == "circle":
-            radius = int(input("Provide the radius for your circle: "))
+        if choice == "circle":
+            radius = get_number("Provide the radius for your circle: ", int)
             t.clear()
             t.penup()
             t.goto(0,0)
@@ -38,57 +45,36 @@ def shapes():
             t.setheading(0)
             t.circle(radius)
 
-        elif choice.lower() == "rectangle":
-            length = int(input("Enter the length of your rectangle : "))
-            width = int(input("Enter the width of your rectangle : "))
+        elif choice == "rectangle":
+            length = get_number("Enter the length of your rectangle: ", int)
+            width = get_number("Enter the width of your rectangle: ", int)
 
             t.clear()
             t.penup()
-            #centers the shape, by moving turtle to the bottom left
             t.goto(-length / 2, -width / 2)
             t.setheading(0)
             t.pendown()
 
-            for x in range(2):
+            for _ in range(2):
                 t.forward(length)
                 t.left(90)
                 t.forward(width)
                 t.left(90)
+                
+        elif choice in valid_polygons:
+            length = get_number("Enter the desired side length: ", int)
+            draw_shape(length, valid_polygons[choice])
             
-
         else:
-            length = int(input("Enter the desired side length : "))
+            print("Sorry, that is not a supported shape.")
 
-            match choice.lower():
-                case "square":
-                    draw_shape(length, 4)
-                case "triangle":
-                    draw_shape(length, 3)
-                case "pentagon":
-                    draw_shape(length, 5) 
-                case "hexagon":
-                    draw_shape(length, 6)
-                case "septagon" | "heptagon":
-                    draw_shape(length, 7)
-                case "octagon":
-                    draw_shape(length, 8)
-                case "nonagon":
-                    draw_shape(length, 9)
-                case "decagon":
-                    draw_shape(length, 10)
-                case _: 
-                    invalid = True
-                    print("Sorry, that is not a supported shape.")
-
-        print("")
-        print("Enter M to return to the main menu")
+        print("\nEnter M to return to the main menu")
         print("Press Enter to generate another shape")
-        exit_choice = input("Your choice:")
+        exit_choice = input("Your choice: ")
 
-        if exit_choice.lower() == "m":
+        if exit_choice.strip().lower() == "m":
             return       
         
-
 def flip_coin():
     count = 0
     headcount = 0
@@ -96,174 +82,130 @@ def flip_coin():
 
     print("------- Coin Flipper -------")
 
-    #main loop
     while True:
-        
-        reveal = input("Press Enter to flip a coin")
-
-        result = random.randint(1,2)
+        input("Press Enter to flip a coin")
+        result = random.randint(1, 2)
 
         if result == 1:
-            print(" ")
-            print("Result: Heads")
-            print(" ")
+            print("\nResult: Heads\n")
             headcount += 1
         else:
-            print(" ")
-            print ("Result: Tails")
-            print(" ")
+            print("\nResult: Tails\n")
             tailcount += 1
+            
         count += 1
 
         print(f"------- That was flip #{count} -------")
         print(f"Total results: {headcount} Heads and {tailcount} Tails")
 
-        print("")
-        print("Enter M to return to the main menu")
+        print("\nEnter M to return to the main menu")
         print("Press Enter to flip another coin")
         exit_choice = input("Your choice: ")
        
-        if exit_choice.lower() == "m":
+        if exit_choice.strip().lower() == "m":
             return       
 
 def calculate_interest():
     print("---- Interest Calculator ----")
 
-    #main loop
     while True:
-        print("")
-        principal = "none"
-        time_period = "none"
-        rate = "none"
-        invalid = False
-
-    #displays option selector
-        print("Are you dealing with simple or compound interest?")
-        print("")
+        print("\nAre you dealing with simple or compound interest?")
         print("Simple Interest:   Enter S")
         print("Compound Interest: Enter C")
-        interest_type=input("Your choice:")
+        interest_type = input("Your choice: ").strip().lower()
 
-        #checks if option is valid
-        if not type(interest_type) == str:
-            invalid = True
-
-        if not invalid:
-
-            #simple interest
-            if interest_type.lower() == "s":
-                #reprompts if input is not a digit
-                while not principal.isdigit():
-                    principal=(input("Please enter your principal amount: $ "))
-                while not rate.isdigit():
-                    rate=(input("Please enter your annual interest rate: %"))
-                while not time_period.isdigit():
-                    time_period=(input("How many years was your money deposited?: "))
-                    final_amount=(int(principal)*int(time_period)*(int(rate)/100))+int(principal)
-
-            #compound interest
-            elif interest_type.lower() == "c":
-                while not principal.isdigit():
-                    principal = (input("Please enter your principal amount: $"))
-                while not rate.isdigit():
-                    rate = (input("Please enter your annual interest rate: %"))
-                while not time_period.isdigit():
-                    time_period = (input("How many years was your money deposited?: "))
-                final_amount = int(principal) * ((int(rate)/100)+1) ** int(time_period)
-
-            #deals with invalid choice at option selector
-            elif interest_type.lower() != "s" and interest_type.lower() != "c":
-                invalid = True
-
-        #invalid error message
-        if invalid:
+        if interest_type not in ('s', 'c'):
             print("Please choose a valid option")
-            
-        #Displaying results
-        elif not invalid:
-            interest = final_amount - int(principal)
-            print("---------------Result------------------")
-            print(f"After {time_period} years with a rate of %{rate}: ")
-            print(f"Your principle amount is: ${int(principal):.2f}")
-            print(f"You now have ${final_amount:.2f}")
-            print(f"You gained: ${interest:.2f}")
+            continue
 
-            print("")
-            print("Enter M to return to the main menu")
-            print("Press Enter to do another calculation")
-            exit_choice = input("Your choice: ")
+        # Float allows for realistic decimals in currency and interest rates
+        principal = get_number("Please enter your principal amount: $ ", float)
+        rate = get_number("Please enter your annual interest rate: % ", float)
+        time_period = get_number("How many years was your money deposited?: ", float)
+
+        if interest_type == "s":
+            final_amount = (principal * time_period * (rate / 100)) + principal
+        else:
+            final_amount = principal * ((rate / 100) + 1) ** time_period
+
+        interest = final_amount - principal
         
-            if exit_choice.lower() == "m":
-                return
+        print("---------------Result------------------")
+        print(f"After {time_period:g} years with a rate of {rate:g}%: ")
+        print(f"Your principal amount is: ${principal:.2f}")
+        print(f"You now have ${final_amount:.2f}")
+        print(f"You gained: ${interest:.2f}")
+
+        print("\nEnter M to return to the main menu")
+        print("Press Enter to do another calculation")
+        exit_choice = input("Your choice: ")
+    
+        if exit_choice.strip().lower() == "m":
+            return
 
 def roll_dice():
-    dice = {"1":"""
-    ⬜️⬜️⬜️⬜️⬜️
+    dice = {
+        "1": """
+    ⬜️⬜️⬜️⬜️⬜️️
     ⬜️⬜️⬜️⬜️⬜️
     ⬜️⬜️⬛️⬜️⬜️
-    ⬜️⬜️⬜️⬜️⬜️
+    ⬜️⬜️⬜️⬜️⬜️️
     ⬜️⬜️⬜️⬜️⬜️""",
-            "2":"""
+        "2": """
     ⬜️⬜️⬜️⬜️⬜️
     ⬜️⬛️⬜️⬜️⬜️
     ⬜️⬜️⬜️⬜️⬜️
     ⬜️⬜️⬜️⬛️⬜️
     ⬜️⬜️⬜️⬜️⬜️""",
-            "3":"""
+        "3": """
     ⬜️⬜️⬜️⬜️⬜️
-    ⬜️⬛️⬜️⬜️⬜️
-    ⬜️⬜️⬜️⬛️⬜️
-    ⬜️⬛️⬜️⬜️⬜️
-    ⬜️⬜️⬜️⬜️⬜️""",
-            "4":"""
-    ⬜️⬜️⬜️⬜️⬜️
-    ⬜️⬛️⬜️⬛️⬜️
-    ⬜️⬜️⬜️⬜️⬜️
-    ⬜️⬛️⬜️⬛️⬜️
-    ⬜️⬜️⬜️⬜️⬜️""",
-            "5":"""
-    ⬜️⬜️⬜️⬜️⬜️
-    ⬜️⬛️⬜️⬛️⬜️
+    ⬜️⬛️⬜️⬜️️⬜️
     ⬜️⬜️⬛️⬜️⬜️
+    ⬜️⬜️⬜️⬛️⬜️
+    ⬜️⬜️⬜️⬜️️⬜️""",
+        "4": """
+    ⬜️⬜️⬜️⬜️⬜️
+    ⬜️⬛️⬜️⬛️⬜️
+    ⬜️⬜️⬜️⬜️⬜️
     ⬜️⬛️⬜️⬛️⬜️
     ⬜️⬜️⬜️⬜️⬜️""",
-            "6":"""
+        "5": """
     ⬜️⬜️⬜️⬜️⬜️
-    ⬜️⬛️⬛️⬛️⬜️
-    ⬜️⬛️⬛️⬛️⬜️
-    ⬜️⬛️⬛️⬛️⬜️
-    ⬜️⬜️⬜️⬜️⬜️""",}
+    ⬜️⬛️⬜️⬛️⬜️
+    ⬜️⬜️⬛️️⬜️⬜️
+    ⬜️⬛️⬜️⬛️⬜️
+    ⬜️⬜️⬜️⬜️⬜️""",
+        "6": """
+    ⬜️⬜️⬜️⬜️⬜️
+    ⬜️⬛️⬜️⬛️⬜️
+    ⬜️⬛️⬜️⬛️⬜️
+    ⬜️⬛️⬜️⬛️⬜️
+    ⬜️⬜️⬜️⬜️⬜️"""
+    }
 
-    print("")
-    print("---- Dice Roller ----")
-    print("")
+    print("\n---- Dice Roller ----\n")
     
     while True:
-        print("")
         dice_total = 0
+        dice_count = get_number("\nHow many dice would you like to roll?: ", int)
 
-        dice_count = int(input("How many dice would you like to roll?: "))
-
-        for i in range(dice_count):
-            x = random.randint(1,6)
+        for _ in range(dice_count):
+            x = random.randint(1, 6)
             dice_total += x
-            print(dice[f"{x}"])
+            print(dice[str(x)])
 
-        print("")
-        print(f"Sum of all dice:{dice_total}")  
+        print(f"\nSum of all dice: {dice_total}")  
 
-        print("")
-        print("Enter M to return to the main menu")
+        print("\nEnter M to return to the main menu")
         print("Press Enter to roll dice again")
         exit_choice = input("Your choice: ")
         
-        if exit_choice.lower() == "m":
+        if exit_choice.strip().lower() == "m":
             return
         
-#MAIN MENU LOOP
 def main():
     while True:
-        print("----Multi Purpose Calculator Tool v2----")
+        print("\n----Multi Purpose Calculator Tool v2----")
         main_choice = input("""
         What would you like to do?
 
@@ -273,9 +215,9 @@ def main():
         -Roll a dice:        Enter D
         Enter Q to Quit
 
-        Your choice: """)
+        Your choice: """).strip().lower()
 
-        match main_choice.lower():
+        match main_choice:
             case "s":
                 shapes()
             case "f":
@@ -287,10 +229,8 @@ def main():
             case "q":
                 break
             case _:
-                print("")
-                print("Sorry, that's not a valid choice")
+                print("\nSorry, that's not a valid choice")
                 input("Press Enter to try again")
         
-
 if __name__ == "__main__":
     main()
